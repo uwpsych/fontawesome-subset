@@ -19,9 +19,6 @@
     "@fortawesome/fontawesome-free": "^5.11.2",
     "mkdirp": "^0.5.1"
   },
-  "optionalDependencies": {
-    "@fortawesome/fontawesome-pro": "^5.11.2"
-  },
   "license": "GPL-3.0-or-later",
   "repository": {
     "type" : "git",
