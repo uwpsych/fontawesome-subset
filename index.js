@@ -29,11 +29,7 @@ function fontawesomeSubset(subset, output_dir, options){
         duotone: 'fa-duotone-900',
     };
 
-    const opts = {
-        ...{
-            package: 'free',
-        }, ...options
-    };
+    const opts = options;
 
     // If 'subset' is set to array, turn into object defaulted for 'solid' use (fontawesome free)
     if (Array.isArray(subset)) {
@@ -42,7 +38,7 @@ function fontawesomeSubset(subset, output_dir, options){
 
     for (let [font_family, icons] of Object.entries(subset)) {
         // Skip if invalid font family
-        let svg_file_path = `node_modules/@fortawesome/fontawesome-${opts.package}/webfonts/${font_map[font_family]}.svg`;
+        let svg_file_path = options.fonts[font_family];
 
         // Skip if current font family is not found in font_map.
         if (Object.keys(font_map).indexOf(font_family) === -1) {
