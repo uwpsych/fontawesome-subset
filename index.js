@@ -36,6 +36,8 @@ function fontawesomeSubset(subset, output_dir, options){
         subset = {'solid': subset};
     }
 
+    let should_create_output = true;
+
     for (let [font_family, icons] of Object.entries(subset)) {
         // Skip if invalid font family
         let svg_file_path = options.fonts[font_family];
@@ -71,14 +73,8 @@ function fontawesomeSubset(subset, output_dir, options){
 
                 return glyphs;
             })(svg_file),
-            svg_contents_new = svg_file.replace(new RegExp(`(<glyph glyph-name="(${glyphs_to_remove.join('|')})".*?\\/>)`, 'gms'), '').replace(/>\s+</gms, '><'),
-            ttf_utils = svg2ttf(svg_contents_new, {
-                fullname: 'FontAwesome ' + font_family,
-                familyname: 'FontAwesome',
-                subfamilyname: font_family,
-            }),
-            ttf = Buffer.from(ttf_utils.buffer);
-
+            svg_contents_new = svg_file.replace(new RegExp(`(<glyph glyph-name="(${glyphs_to_remove.join('|')})".*?\\/>)`, 'gms'), '').replace(/>\s+</gms, '><');
+            
         mkdirp.sync(path.resolve(output_dir), (err) => {
             if (err) {
                 console.error(err);
@@ -88,11 +84,31 @@ function fontawesomeSubset(subset, output_dir, options){
 
         const output_file = path.resolve(output_dir, font_map[font_family]);
 
-        fs.writeFileSync(`${output_file}.svg`, svg_contents_new);
-        fs.writeFileSync(`${output_file}.ttf`, ttf);
-        fs.writeFileSync(`${output_file}.eot`, ttf2eot(ttf).buffer);
-        fs.writeFileSync(`${output_file}.woff`, ttf2woff(ttf).buffer);
-        fs.writeFileSync(`${output_file}.woff2`, ttf2woff2(ttf));
+        const svg_output_path = `${output_file}.svg`;
+        if (fs.existsSync(svg_output_path)) {
+            const svg_contents_old = fs.readFileSync(svg_output_path).toString();
+            if (svg_contents_new === svg_contents_old) {
+                should_create_output = false;
+            }
+        }
+
+        if (should_create_output) {
+            const ttf_utils = svg2ttf(svg_contents_new, {
+                    fullname: "FontAwesome " + font_family,
+                    familyname: "FontAwesome",
+                    subfamilyname: font_family,
+                }),
+                ttf = Buffer.from(ttf_utils.buffer),
+                eot = ttf2eot(ttf).buffer,
+                woff = ttf2woff(ttf).buffer,
+                woff2 = ttf2woff2(ttf);
+
+            fs.writeFileSync(`${output_file}.svg`, svg_contents_new);
+            fs.writeFileSync(`${output_file}.ttf`, ttf);
+            fs.writeFileSync(`${output_file}.eot`, eot);
+            fs.writeFileSync(`${output_file}.woff`, woff);
+            fs.writeFileSync(`${output_file}.woff2`, woff2);
+        }
     }
 }
 
