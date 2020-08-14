@@ -36,9 +36,10 @@ function fontawesomeSubset(subset, output_dir, options){
         subset = {'solid': subset};
     }
 
-    let should_create_output = true;
-
     for (let [font_family, icons] of Object.entries(subset)) {
+        // Keep track of whether to create output files
+        let should_create_output = true;
+
         // Skip if invalid font family
         let svg_file_path = options.fonts[font_family];
 
@@ -92,6 +93,7 @@ function fontawesomeSubset(subset, output_dir, options){
             }
         }
 
+        // Only create new files of the SVG contents has changed
         if (should_create_output) {
             const ttf_utils = svg2ttf(svg_contents_new, {
                     fullname: "FontAwesome " + font_family,
